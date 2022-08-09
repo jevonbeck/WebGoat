@@ -23,6 +23,7 @@
 
 package org.owasp.webgoat.lessons.xss;
 
+import org.owasp.encoder.Encode;
 import org.owasp.webgoat.container.assignments.AssignmentEndpoint;
 import org.owasp.webgoat.container.assignments.AssignmentHints;
 import org.owasp.webgoat.container.assignments.AttackResult;
@@ -62,8 +63,9 @@ public class CrossSiteScriptingLesson5a extends AssignmentEndpoint {
 
         userSessionData.setValue("xss-reflected1-complete", "false");
         StringBuilder cart = new StringBuilder();
+        String cleanField1 = Encode.forHtml(field1);
         cart.append("Thank you for shopping at WebGoat. <br />Your support is appreciated<hr />");
-        cart.append("<p>We have charged credit card:" + field1 + "<br />");
+        cart.append("<p>We have charged credit card:" + cleanField1 + "<br />");
         cart.append("                             ------------------- <br />");
         cart.append("                               $" + totalSale);
 

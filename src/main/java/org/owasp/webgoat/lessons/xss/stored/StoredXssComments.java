@@ -24,6 +24,7 @@ package org.owasp.webgoat.lessons.xss.stored;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import org.owasp.encoder.Encode;
 import org.owasp.webgoat.container.assignments.AssignmentEndpoint;
 import org.owasp.webgoat.container.assignments.AttackResult;
 import org.owasp.webgoat.container.session.WebSession;
@@ -105,7 +106,9 @@ public class StoredXssComments extends AssignmentEndpoint {
     private Comment parseJson(String comment) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(comment, Comment.class);
+            Comment parsedComment = mapper.readValue(comment, Comment.class);
+            parsedComment.setText(Encode.forHtml(parsedComment.getText()));
+            return parsedComment;
         } catch (IOException e) {
             return new Comment();
         }

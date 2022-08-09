@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -55,7 +56,7 @@ public class ContentTypeAssignment extends AssignmentEndpoint {
     @Autowired
     private CommentsCache comments;
 
-    @PostMapping(path = "xxe/content-type")
+    @PostMapping(path = "xxe/content-type", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ResponseBody
     public AttackResult createNewUser(HttpServletRequest request, @RequestBody String commentStr, @RequestHeader("Content-Type") String contentType) throws Exception {
         AttackResult attackResult = failed(this).build();
@@ -63,20 +64,6 @@ public class ContentTypeAssignment extends AssignmentEndpoint {
         if (APPLICATION_JSON_VALUE.equals(contentType)) {
             comments.parseJson(commentStr).ifPresent(c -> comments.addComment(c, true));
             attackResult = failed(this).feedback("xxe.content.type.feedback.json").build();
-        }
-
-        if (null != contentType && contentType.contains(MediaType.APPLICATION_XML_VALUE)) {
-            String error = "";
-            try {
-                Comment comment = comments.parseXml(commentStr);
-                comments.addComment(comment, false);
-                if (checkSolution(comment)) {
-                    attackResult = success(this).build();
-                }
-            } catch (Exception e) {
-                error = ExceptionUtils.getStackTrace(e);
-                attackResult = failed(this).feedback("xxe.content.type.feedback.xml").output(error).build();
-            }
         }
 
         return attackResult;

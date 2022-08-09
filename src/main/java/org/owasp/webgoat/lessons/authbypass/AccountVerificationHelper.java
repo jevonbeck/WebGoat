@@ -67,21 +67,21 @@ public class AccountVerificationHelper {
     //end of cheating check ... the method below is the one of real interest. Can you find the flaw?
 
     public boolean verifyAccount(Integer userId, HashMap<String, String> submittedQuestions) {
-        //short circuit if no questions are submitted
-        if (submittedQuestions.entrySet().size() != secQuestionStore.get(verifyUserId).size()) {
-            return false;
-        }
-
-        if (submittedQuestions.containsKey("secQuestion0") && !submittedQuestions.get("secQuestion0").equals(secQuestionStore.get(verifyUserId).get("secQuestion0"))) {
-            return false;
-        }
-
-        if (submittedQuestions.containsKey("secQuestion1") && !submittedQuestions.get("secQuestion1").equals(secQuestionStore.get(verifyUserId).get("secQuestion1"))) {
-            return false;
-        }
+        boolean hasRequiredNumberOfQuestions =
+                submittedQuestions.entrySet().size() == secQuestionStore.get(verifyUserId).size();
+        boolean answeredFirstQuestionCorrectly =
+                answeredQuestionCorrectly("secQuestion0", submittedQuestions);
+        boolean answeredSecondQuestionCorrectly =
+                answeredQuestionCorrectly("secQuestion1", submittedQuestions);
 
         // else
-        return true;
+        return hasRequiredNumberOfQuestions && answeredFirstQuestionCorrectly && answeredSecondQuestionCorrectly;
 
+    }
+
+    private boolean answeredQuestionCorrectly(String questionName, HashMap<String, String> submittedQuestions) {
+        return submittedQuestions.containsKey(questionName) &&
+                submittedQuestions.get(questionName).equals(
+                        secQuestionStore.get(verifyUserId).get(questionName));
     }
 }
